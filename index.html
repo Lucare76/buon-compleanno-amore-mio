@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buon Compleanno Annalisa ❤️</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0005;
+    font-family: 'Georgia', serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* SCHERMATA INIZIALE */
+  #splash {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, #1a0010 0%, #0a0005 70%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    cursor: pointer;
+    transition: opacity 1.2s ease;
+  }
+
+  #splash .touch-hint {
+    color: #ff6b9d;
+    font-size: 1.1rem;
+    letter-spacing: 0.15em;
+    opacity: 0;
+    animation: pulse 2s ease-in-out 1s infinite;
+    text-transform: uppercase;
+  }
+
+  #splash .heart-big {
+    font-size: 5rem;
+    animation: heartbeat 1.4s ease-in-out infinite;
+    margin-bottom: 2rem;
+    filter: drop-shadow(0 0 20px #ff4488);
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    15% { transform: scale(1.15); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.08); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  /* CANVAS CUORI */
+  #hearts-canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* CONTENUTO PRINCIPALE */
+  #main {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem 4rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* TITOLO */
+  .title-section {
+    text-align: center;
+    margin-bottom: 3rem;
+    animation: fadeInDown 1.5s ease forwards;
+  }
+
+  .title-section h1 {
+    color: #ff6b9d;
+    font-size: clamp(2rem, 8vw, 3.5rem);
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 40px rgba(255, 107, 157, 0.6);
+    margin-bottom: 0.5rem;
+  }
+
+  .title-section .subtitle {
+    color: #ffb3d1;
+    font-size: clamp(1rem, 4vw, 1.3rem);
+    font-style: italic;
+    letter-spacing: 0.1em;
+  }
+
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* FOTO */
+  .photos-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    width: 100%;
+    max-width: 480px;
+    margin-bottom: 3rem;
+  }
+
+  .photo-card {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+    transition: all 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 0 40px rgba(255, 100, 150, 0.25);
+  }
+
+  .photo-card.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .photo-card img {
+    width: 100%;
+    display: block;
+    border-radius: 16px;
+  }
+
+  .photo-card .glow-border {
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    border: 2px solid rgba(255, 107, 157, 0.5);
+    pointer-events: none;
+  }
+
+  /* MESSAGGIO */
+  .message-box {
+    max-width: 480px;
+    text-align: center;
+    padding: 2.5rem 2rem;
+    background: rgba(255, 100, 150, 0.07);
+    border: 1px solid rgba(255, 107, 157, 0.25);
+    border-radius: 20px;
+    opacity: 0;
+    animation: fadeIn 2s ease 3s forwards;
+    margin-bottom: 2rem;
+  }
+
+  .message-box .hearts-row {
+    color: #ff6b9d;
+    font-size: 1.5rem;
+    margin-bottom: 1.2rem;
+    letter-spacing: 0.3em;
+  }
+
+  .message-box p {
+    color: #ffd6e7;
+    font-size: clamp(1rem, 3.5vw, 1.2rem);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  .message-box .firma {
+    margin-top: 1.5rem;
+    color: #ff6b9d;
+    font-size: 1rem;
+    letter-spacing: 0.15em;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* PLAYER MUSICALE */
+  .music-hint {
+    color: rgba(255, 107, 157, 0.5);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+  audio { display: none; }
+
+  /* PETALI */
+  .petal {
+    position: fixed;
+    pointer-events: none;
+    z-index: 2;
+    font-size: 1.2rem;
+    animation: petalFall linear infinite;
+    opacity: 0;
+  }
+
+  @keyframes petalFall {
+    0%   { opacity: 0; transform: translateY(-20px) rotate(0deg); }
+    10%  { opacity: 0.9; }
+    90%  { opacity: 0.7; }
+    100% { opacity: 0; transform: translateY(110vh) rotate(720deg); }
+  }
+</style>
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash" onclick="startExperience()">
+  <div class="heart-big">❤️</div>
+  <div class="touch-hint">Tocca per aprire ✨</div>
+</div>
+
+<!-- CANVAS CUORI ANIMATI -->
+<canvas id="hearts-canvas"></canvas>
+
+<!-- AUDIO -->
+<audio id="audio" loop>
+  <source src="super mamma_super compagna.mp3" type="audio/mpeg">
+</audio>
+
+<!-- PETALI -->
+<div id="petals-container"></div>
+
+<!-- CONTENUTO PRINCIPALE -->
+<div id="main">
+
+  <div class="title-section">
+    <h1>Buon Compleanno<br>Annalisa 🌹</h1>
+    <div class="subtitle">per la donna più speciale della mia vita</div>
+  </div>
+
+  <div class="photos-container">
+    <div class="photo-card" id="photo1">
+      <img src="family.jpg" alt="Famiglia">
+      <div class="glow-border"></div>
+    </div>
+    <div class="photo-card" id="photo2">
+      <img src="io-e-aury.jpg" alt="Io e Aury">
+      <div class="glow-border"></div>
+    </div>
+    <div class="photo-card" id="photo3">
+      <img src="ilenia-e-aury.jpg" alt="Ilenia e Aury">
+      <div class="glow-border"></div>
+    </div>
+  </div>
+
+  <div class="message-box">
+    <div class="hearts-row">❤️ ❤️ ❤️</div>
+    <p>
+      Ogni giorno al tuo fianco è un dono che non smette mai di sorprendermi.<br><br>
+      Sei la mamma più bella, la compagna più forte, la persona che rende
+      tutto più luminoso — anche i giorni difficili.<br><br>
+      Oggi si festeggia te, ma il regalo più grande me lo hai fatto tu,
+      semplicemente esistendo nella mia vita.
+    </p>
+    <div class="firma">Con tutto il mio amore ❤️</div>
+  </div>
+
+  <div class="music-hint">♪ con la nostra canzone ♪</div>
+
+</div>
+
+<script>
+let started = false;
+
+function startExperience() {
+  if (started) return;
+  started = true;
+
+  const splash = document.getElementById('splash');
+  splash.style.opacity = '0';
+  splash.style.pointerEvents = 'none';
+  setTimeout(() => splash.style.display = 'none', 1200);
+
+  const main = document.getElementById('main');
+  main.style.display = 'flex';
+
+  const audio = document.getElementById('audio');
+  audio.play().catch(() => {});
+
+  startHearts();
+  startPetals();
+
+  setTimeout(() => document.getElementById('photo1').classList.add('visible'), 600);
+  setTimeout(() => document.getElementById('photo2').classList.add('visible'), 1400);
+  setTimeout(() => document.getElementById('photo3').classList.add('visible'), 2200);
+}
+
+/* ---- CUORI CANVAS ---- */
+function startHearts() {
+  const canvas = document.getElementById('hearts-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+
+  const particles = [];
+  for (let i = 0; i < 28; i++) {
+    particles.push(createParticle());
+  }
+
+  function createParticle() {
+    return {
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height + canvas.height,
+      size: Math.random() * 14 + 6,
+      speedY: Math.random() * 1.2 + 0.4,
+      speedX: (Math.random() - 0.5) * 0.6,
+      opacity: Math.random() * 0.5 + 0.15,
+      color: `hsl(${Math.random() * 30 + 330}, 80%, ${Math.random() * 20 + 60}%)`
+    };
+  }
+
+  function drawHeart(ctx, x, y, size) {
+    ctx.beginPath();
+    ctx.moveTo(x, y + size * 0.3);
+    ctx.bezierCurveTo(x, y, x - size, y, x - size, y + size * 0.4);
+    ctx.bezierCurveTo(x - size, y + size * 0.9, x, y + size * 1.2, x, y + size * 1.5);
+    ctx.bezierCurveTo(x, y + size * 1.2, x + size, y + size * 0.9, x + size, y + size * 0.4);
+    ctx.bezierCurveTo(x + size, y, x, y, x, y + size * 0.3);
+    ctx.closePath();
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.y -= p.speedY;
+      p.x += p.speedX;
+      if (p.y < -50) {
+        p.y = canvas.height + 50;
+        p.x = Math.random() * canvas.width;
+      }
+      ctx.save();
+      ctx.globalAlpha = p.opacity;
+      ctx.fillStyle = p.color;
+      ctx.translate(p.x, p.y);
+      drawHeart(ctx, 0, 0, p.size);
+      ctx.fill();
+      ctx.restore();
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+/* ---- PETALI ---- */
+function startPetals() {
+  const container = document.getElementById('petals-container');
+  const emojis = ['🌸', '🌹', '🌺', '💕', '✨'];
+
+  function spawnPetal() {
+    const el = document.createElement('div');
+    el.className = 'petal';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.top = '-30px';
+    const dur = Math.random() * 6 + 7;
+    el.style.animationDuration = dur + 's';
+    el.style.animationDelay = '0s';
+    el.style.fontSize = (Math.random() * 0.8 + 0.8) + 'rem';
+    container.appendChild(el);
+    setTimeout(() => el.remove(), (dur + 1) * 1000);
+  }
+
+  setInterval(spawnPetal, 600);
+}
+</script>
+</body>
+</html>
